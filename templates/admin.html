@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Admin: users</h2>
+<p>Total users: {{ rows|length }}</p>
+<table border="1" cellpadding="6">
+  <tr>
+    <th>Username</th><th>Total</th>
+    {% for s in statuses %}<th>{{ s }}</th>{% endfor %}
+    <th>Last add</th>
+  </tr>
+  {% for r in rows %}
+  <tr>
+    <td>{{ r.username }}</td>
+    <td>{{ r.total }}</td>
+    {% for s in statuses %}<td>{{ r.counts[s] }}</td>{% endfor %}
+    <td>{{ r.last or "-" }}</td>
+  </tr>
+  {% endfor %}
+</table>
+<a href="/">Back </a>
+{% endblock %}

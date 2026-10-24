@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{{ "Edit" if job else "New" }} application</h2>
+<form method="post">
+  <input name="company" placeholder="Company" value="{{ job.company if job else '' }}" required><br>
+  <input name="role" placeholder="Role" value="{{ job.role if job else '' }}" required><br>
+  <input name="job_link" placeholder="Job post link (optional)" value="{{ (job.job_link or '') if job else '' }}"><br>
+  <select name="status">
+    {% for s in statuses %}
+    <option {{ "selected" if job and job.status == s else "" }}>{{ s }}</option>
+    {% endfor %}
+  </select><br>
+  <label>Follow-up date (optional)</label><br>
+  <input type="date" name="follow_up" value="{{ job.follow_up if job and job.follow_up else '' }}"><br>
+  <textarea name="notes" placeholder="Notes (optional)" rows="4" cols="30">{{ (job.notes or '') if job else '' }}</textarea><br>
+  <button>Save</button>
+</form>
+<a href="/">Back</a>
+{% endblock %}

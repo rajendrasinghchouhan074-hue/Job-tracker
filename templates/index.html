@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Welcome, {{ current_user.username }}!</h2>
+<a href="/add">+ New application</a> | <a href="/export">Download CSV</a> | <a href="/change-password">Change password</a> | <a href="/logout">Logout</a>
+<h3>Dashboard</h3>
+<p>Total applications: <b>{{ total }}</b></p>
+{% if due_count %}
+<p style="color:#dc2626"><b>{{ due_count }}</b> follow-up(s) due today or overdue</p>
+{% endif %}
+
+{% for s in statuses %}
+  {% set pct = (counts[s] * 100 / total) if total else 0 %}
+  <div style="margin:6px 0">
+    {{ s }}: <b>{{ counts[s] }}</b>
+    <div style="background:#ddd; width:100%; max-width:300px; height:14px">
+      <div style="background:#3b82f6; width:{{ pct }}%; height:14px"></div>
+    </div>
+  </div>
+{% endfor %}
+
+<h3>Applications</h3>
+<form method="get" action="/" style="margin-bottom:10px">
+  <input name="q" placeholder="Search company or role" value="{{ q }}">
+  <select name="status">
+    <option value="">All statuses</option>
+    {% for s in statuses %}
+    <option value="{{ s }}" {{ "selected" if selected == s else "" }}>{{ s }}</option>
+    {% endfor %}
+  </select>
+  <button>Search</button>
+  {% if q or selected %}<a href="/">Clear</a>{% endif %}
+</form>
+<p>Showing {{ jobs|length }} of {{ total }}</p>
+
+<div style="overflow-x:auto">
+<table>
+  <tr><th>Company</th><th>Role</th><th>Status</th><th>Date</th><th>Follow-up</th><th>Link</th><th>Notes</th><th></th></tr>
+  {% for job in jobs %}
+  <tr>
+    <td>{{ job.company }}</td>
+    <td>{{ job.role }}</td>
+    <td>{{ job.status }}</td>
+    <td>{{ job.date_applied }}</td>
+    <td>
+      {% if job.follow_up %}
+        {% if job.follow_up <= today and job.status in ["Applied", "Interview"] %}
+          <span style="color:#dc2626"><b>{{ job.follow_up }}</b></span>
+        {% else %}
+          {{ job.follow_up }}
+        {% endif %}
+      {% endif %}
+    </td>
+    <td>{% if job.job_link %}<a href="{{ job.job_link }}" target="_blank" rel="noopener noreferrer">Open</a>{% endif %}</td>
+    <td>{{ job.notes or "" }}</td>
+    <td>
+      <a href="/edit/{{ job.id }}">Edit</a>
+      <form method="post" action="/delete/{{ job.id }}" style="display:inline">
+        <button>Delete</button>
+      </form>
+    </td>
+  </tr>
+  {% else %}
+  <tr><td colspan="8">No applications found</td></tr>
+  {% endfor %}
+</table>
+</div>
+{% endblock %}
